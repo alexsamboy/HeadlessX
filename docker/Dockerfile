@@ -19,7 +19,7 @@ COPY website/ ./
 RUN npm run build
 
 # Stage 2: Production runtime
-FROM mcr.microsoft.com/playwright:v1.55.0-noble
+FROM mcr.microsoft.com/playwright:v1.55.1-noble
 
 # Install essential system dependencies (removed nginx - not needed in container)
 RUN apt-get update && apt-get install -y \
@@ -34,10 +34,13 @@ COPY package*.json ./
 
 # Install production dependencies
 RUN if [ -f "package-lock.json" ]; then \
-        npm ci --omit=dev; \
+        npm ci --only=production; \
     else \
         npm install --production; \
     fi && npm cache clean --force
+
+# 🔑 Install Playwright browsers (Chromium only to reduce image size)
+RUN npx playwright install --with-deps chromium
 
 # Copy modular application source
 COPY src/ ./src/
