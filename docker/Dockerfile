@@ -34,13 +34,10 @@ COPY package*.json ./
 
 # Install production dependencies
 RUN if [ -f "package-lock.json" ]; then \
-        npm ci --only=production; \
+        npm ci --omit=dev; \
     else \
         npm install --production; \
     fi && npm cache clean --force
-
-# 🔑 Install Playwright browsers (Chromium only to reduce image size)
-RUN npx playwright install --with-deps chromium
 
 # Copy modular application source
 COPY src/ ./src/
